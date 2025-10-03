@@ -49,43 +49,6 @@ conv_f32:
     .word   0x50150000                    # 1e10
     .word   0xd0150000                    # -1e10
 
-bf16_add_input:
-
-    .word   0x3f80, 0x4000                # 1.0 + 2.0
-    .word   0x4049, 0x402e                # 3.140625 + 2.71875
-    .word   0x3f80, 0xffffc000            # 1.0 + -2.0
-    .word   0xffffc000, 0x3f80            # -2.0 + 1.0
-    .word   0x0000, 0x3f80                # 0.0 + 1.0
-    .word   0x3f80, 0x0000                # 1.0 + 0.0
-    .word   0x7f80, 0x3f80                # +Inf + 1.0
-    .word   0x3f80, 0x7f80                # 1.0 + +Inf
-    .word   0xffff80, 0x3f80              # -inf + 1.0
-    .word   0x3f80, 0xffff80              # 1.0 + -inf
-    .word   0x7f62, 0x7f62                # 3e38 + 3e38 (f32 to bf16)
-
-bf16_add_output:
-
-    .word   0x4040                        # 3.0
-    .word   0x40bb                        # 5.84375
-    .word   0xbf80                        # -1.0
-    .word   0xbf80                        # -1.0
-    .word   0x3f80                        # 1.0
-    .word   0x3f80                        # 1.0
-    .word   0x7f80                        # +Inf
-    .word   0x7f80                        # +Inf
-    .word   0xffff80                      # -Inf
-    .word   0xffff80                      # -Inf
-    .word   0x7f80                        # +Inf
-
-roundingValues: 
-
-    .word 0x3FC00000
-    .word 0x3F800347
-
-roundingResults: 
-
-    .word 0x3FC00000
-    .word 0x3F800000
 
 result_msg:
     .string " Result "
