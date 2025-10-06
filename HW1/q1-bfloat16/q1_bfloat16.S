@@ -49,6 +49,31 @@ conv_f32:
     .word   0x50150000                    # 1e10
     .word   0xd0150000                    # -1e10
 
+bf16_add_input:
+.word   0x3f80, 0x4000      #  1.0 + 2.0
+.word   0x4049, 0x402e      #  3.140625 + 2.71875
+.word   0x3f80, 0xffffc000  #  1.0 + -2.0
+.word   0xffffc000, 0x3f80  # -2.0 + 1.0
+.word   0x0000, 0x3f80      #  0.0 + 1.0
+.word   0x3f80, 0x0000      #  1.0 + 0.0
+.word   0x7f80, 0x3f80      # +Inf + 1.0
+.word   0x3f80, 0x7f80      #  1.0 + +Inf
+.word   0xffff80, 0x3f80    # -inf + 1.0
+.word   0x3f80, 0xffff80    #  1.0 + -inf
+.word   0x7f62, 0x7f62      #  3e38 + 3e38 (f32 to bf16)
+
+bf16_add_output:
+.word   0x4040              #  3.0
+.word   0x40bb              #  5.84375
+.word   0xbf80              # -1.0
+.word   0xbf80              # -1.0
+.word   0x3f80              #  1.0
+.word   0x3f80              #  1.0
+.word   0x7f80              # +Inf
+.word   0x7f80              # +Inf
+.word   0xffff80            # -Inf
+.word   0xffff80            # -Inf
+.word   0x7f80              # +Inf
 
 result_msg:
     .string " Result "
@@ -67,7 +92,7 @@ edge_cases_passed_msg:
 rounding_passed_msg:
     .string " Rounding PASS\n"
 All_passed_msg:
-    .string " Fuck finally PASS\n"
+    .string " All PASS\n"
 
 
 conversion_failed_msg:
@@ -185,8 +210,6 @@ test_basic_conversions:
 # conv vs conv_f32 check
     lw      t0, 0(s6)                     # t0 = conv_f32[i]
     bne     s4, t0, 4f                    # if (conv != conv_f32[i]) go to failed
-
-# Print orig and conv for debugging
 
     addi    s0, s0, 1                     # i++
     addi    s1, s1, 4                     # arr_ptr += 4
