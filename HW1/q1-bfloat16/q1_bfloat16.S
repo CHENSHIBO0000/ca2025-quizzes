@@ -49,31 +49,128 @@ conv_f32:
     .word   0x50150000                    # 1e10
     .word   0xd0150000                    # -1e10
 
-bf16_add_input:
-.word   0x3f80, 0x4000      #  1.0 + 2.0
-.word   0x4049, 0x402e      #  3.140625 + 2.71875
-.word   0x3f80, 0xffffc000  #  1.0 + -2.0
-.word   0xffffc000, 0x3f80  # -2.0 + 1.0
-.word   0x0000, 0x3f80      #  0.0 + 1.0
-.word   0x3f80, 0x0000      #  1.0 + 0.0
-.word   0x7f80, 0x3f80      # +Inf + 1.0
-.word   0x3f80, 0x7f80      #  1.0 + +Inf
-.word   0xffff80, 0x3f80    # -inf + 1.0
-.word   0x3f80, 0xffff80    #  1.0 + -inf
-.word   0x7f62, 0x7f62      #  3e38 + 3e38 (f32 to bf16)
+bf16_add_input_1:
+
+    .word   0x3f80                  #  1.0 + 2.0
+    .word   0x4049                  #  3.140625 + 2.71875
+    .word   0x3f80                  #  1.0 + -2.0
+    .word   0xffffc000              # -2.0 + 1.0
+    .word   0x0000                  #  0.0 + 1.0
+    .word   0x3f80                  #  1.0 + 0.0
+    .word   0x7f80                  # +Inf + 1.0
+    .word   0x3f80                  #  1.0 + +Inf
+    .word   0xffff80                # -inf + 1.0
+    .word   0x3f80                  #  1.0 + -inf
+    .word   0x7f62                  #  3e38 + 3e38 (f32 to bf16)
+
+bf16_add_input_2:
+
+    .word   0x4000                  #  1.0 + 2.0
+    .word   0x402e                  #  3.140625 + 2.71875
+    .word   0xffffc000              #  1.0 + -2.0
+    .word   0x3f80                  # -2.0 + 1.0
+    .word   0x3f80                  #  0.0 + 1.0
+    .word   0x0000                  #  1.0 + 0.0
+    .word   0x3f80                  # +Inf + 1.0
+    .word   0x7f80                  #  1.0 + +Inf
+    .word   0x3f80                  # -inf + 1.0
+    .word   0xffff80                #  1.0 + -inf
+    .word   0x7f62                  #  3e38 + 3e38 (f32 to bf16)
 
 bf16_add_output:
-.word   0x4040              #  3.0
-.word   0x40bb              #  5.84375
-.word   0xbf80              # -1.0
-.word   0xbf80              # -1.0
-.word   0x3f80              #  1.0
-.word   0x3f80              #  1.0
-.word   0x7f80              # +Inf
-.word   0x7f80              # +Inf
-.word   0xffff80            # -Inf
-.word   0xffff80            # -Inf
-.word   0x7f80              # +Inf
+
+    .word   0x4040                        #  3.0
+    .word   0x40bb                        #  5.84375
+    .word   0xbf80                        # -1.0
+    .word   0xbf80                        # -1.0
+    .word   0x3f80                        #  1.0
+    .word   0x3f80                        #  1.0
+    .word   0x7f80                        # +Inf
+    .word   0x7f80                        # +Inf
+    .word   0xffff80                      # -Inf
+    .word   0xffff80                      # -Inf
+    .word   0x7f80                        # +Inf
+
+bf16_sub_input_1:
+
+    .word   0x4000                          #  2.0 - 1.0
+    .word   0x4049                          #  3.140625 - 2.71875
+    .word   0x3f80                          #  1.0 - -2.0
+
+bf16_sub_input_2:
+
+    .word   0x3f80                          #  2.0 - 1.0
+    .word   0x402e                          #  3.140625 - 2.71875
+    .word   0xffffc000                      #  1.0 - -2.0
+
+bf16_sub_output:
+
+    .word   0x3f80                          #  1.0
+    .word   0x3ed8                          #  0.421875
+    .word   0x4040                          #  3.0
+
+bf16_mul_input_1:
+
+    .word   0x4040                          #  3.0 * 4.0
+    .word   0x4049                          #  3.140625 * 2.71875
+    .word   0x7f80                          # +Inf * 1.0
+    .word   0x7f80                          # +Inf * 0.0
+
+bf16_mul_input_2:
+
+    .word   0x4080                          #  3.0 * 4.0
+    .word   0x402e                          #  3.140625 * 2.71875
+    .word   0x3f80                          # +Inf * 1.0
+    .word   0x0000                          # +Inf * 0.0
+
+bf16_mul_output:
+
+    .word   0x4140                          #  12.0
+    .word   0x4108                          #  8.5
+    .word   0x7f80                          # +Inf
+    .word   0x7fc0                          #  NaN
+
+bf16_div_input_1:
+
+    .word   0x4120                          #  10.0 / 2.0
+    .word   0xffffc120                      # -10.0 / 2.0
+    .word   0x4128                          #  10.5 / 0.5
+    .word   0x7f80                          # +Inf / +Inf
+    .word   0x3f80                          #  1.0 / +Inf
+    .word   0x7f80                          # +Inf / 1.0
+    .word   0x3f80                          #  1.0 / 0.0
+
+bf16_div_input_2:
+
+    .word   0x4000                          #  10.0 / 2.0
+    .word   0x4000                          # -10.0 / 2.0
+    .word   0x3f00                          #  10.5 / 0.5
+    .word   0x7f80                          # +Inf / +Inf
+    .word   0x7f80                          #  1.0 / +Inf
+    .word   0x3f80                          # +Inf / 1.0
+    .word   0x0000                          #  1.0 / 0.0
+
+bf16_div_output:
+
+    .word  0x40a0                        #  5.0
+    .word  0xc0a0                        # -5.0
+    .word  0x41a8                        # 21.0
+    .word  0x7fc0                        #  NaN
+    .word  0x0000                        #  0.0
+    .word  0x7f80                        # +Inf
+    .word  0x7f80                        # +Inf
+
+bf16_sqrt_input:
+
+    .word  0x4080                        # 4.0
+    .word  0x4110                        # 9.0
+    .word  0x42a2                        # 81.0
+
+bf16_sqrt_output:
+
+    .word  0x4000                        # 2.0
+    .word  0x4040                        # 3.0
+    .word  0x4110                        # 9.0
 
 result_msg:
     .string " Result "
@@ -92,7 +189,7 @@ edge_cases_passed_msg:
 rounding_passed_msg:
     .string " Rounding PASS\n"
 All_passed_msg:
-    .string " All PASS\n"
+    .string " All PASS :)\n"
 
 
 conversion_failed_msg:
@@ -202,7 +299,6 @@ test_basic_conversions:
     slt     t2, s4, x0                    # t2 = conv < 0
     bne     t1, t2, 4f                    # if (orig < 0) != (conv < 0) go to failed
 2:
-
 # bf vs conv_bf16 check
     lw      t0, 0(s5)                     # t0 = conv_bf16[i]
     bne     s3, t0, 4f                    # if (bf != conv_bf16[i]) go to failed
@@ -210,6 +306,8 @@ test_basic_conversions:
 # conv vs conv_f32 check
     lw      t0, 0(s6)                     # t0 = conv_f32[i]
     bne     s4, t0, 4f                    # if (conv != conv_f32[i]) go to failed
+
+# Print orig and conv for debugging
 
     addi    s0, s0, 1                     # i++
     addi    s1, s1, 4                     # arr_ptr += 4
@@ -404,115 +502,141 @@ test_comparisons:
 #                                                                              #
 #                                                                              #
 #------------------------------------------------------------------------------#
-# s0 : a
-# s1 : b
-# s2 : c  
-# s3 : result
-# s4 : golden
+# s0 : arr_ptr_1
+# s1 : arr_ptr_2
+# s2 : golden_arr_ptr
+# s3 : operand_1
+# s4 : operand_2
+# s5 : golden
+# s6 : answer
+# s7 : i
+# s8 : NUMBER_OF_TEST
+
 test_arithmetic:
+
     addi    sp, sp, -4
     sw      ra, 0(sp)
+
+# ADD
+    li      s7, 0
+    li      s8, 11
+    la      s0, bf16_add_input_1                    
+    la      s1, bf16_add_input_2                    
+    la      s2, bf16_add_output                     
     
-    li      a0, 0x3F800000
-    jal     ra, f32_to_bf16                # f32_to_bf16(orig)
-    mv      s0, a0
-
-    li      a0, 0x40000000
-    jal     ra, f32_to_bf16 
-    mv      s1, a0    
-
-#1.0f + 2.0f
-    mv      a0, s0
-    mv      a1, s1
- 
+ADD_TEST:
+    lw      a0, 0(s0)
+    lw      a1, 0(s1)
+    lw      s5, 0(s2)
+    
     jal     ra, bf16_add
-    mv      s2, a0
+    mv      s6, a0    
 
-    jal     ra, bf16_to_f32
-    mv      s3, a0
+    bne     s6, s5, 1f 
     
-    li      s4, 0x40400000
-    bne     s3, s4 1f
-    
-#2.0f - 1.0f
-    mv      a0, s1    
-    mv      a1, s0
+    addi    s0, s0, 4
+    addi    s1, s1, 4
+    addi    s2, s2, 4
 
+    addi    s7, s7, 1
+    bne     s8, s7, ADD_TEST
+
+
+# SUB
+    li      s7, 0
+    li      s8, 3
+    la      s0, bf16_sub_input_1                    
+    la      s1, bf16_sub_input_2                    
+    la      s2, bf16_sub_output                     
+    
+SUB_TEST:
+    lw      a0, 0(s0)
+    lw      a1, 0(s1)
+    lw      s5, 0(s2)
+    
     jal     ra, bf16_sub
-    mv      s2, a0
+    mv      s6, a0    
 
-    jal     ra, bf16_to_f32
-    mv      s3, a0
-
-    li      s4, 0x3F800000
-    bne     s3, s4 1f    
+    bne     s6, s5, 1f 
     
-#3.0f * 4.0f
-    li      a0, 0x40400000
-    jal     ra, f32_to_bf16                # f32_to_bf16(orig)
-    mv      s0, a0
+    addi    s0, s0, 4
+    addi    s1, s1, 4
+    addi    s2, s2, 4
 
-    li      a0, 0x40800000
-    jal     ra, f32_to_bf16 
-    mv      s1, a0    
-
-    mv      a0, s0    
-    mv      a1, s1
-
+    addi    s7, s7, 1
+    bne     s8, s7, SUB_TEST
+    
+# MUL
+    li      s7, 0
+    li      s8, 4
+    la      s0, bf16_mul_input_1                    
+    la      s1, bf16_mul_input_2                    
+    la      s2, bf16_mul_output                     
+    
+MUL_TEST:
+    lw      a0, 0(s0)
+    lw      a1, 0(s1)
+    lw      s5, 0(s2)
+    
     jal     ra, bf16_mul
-    mv      s2, a0   
+    mv      s6, a0    
+    
+    bne     s6, s5, 1f 
 
-    jal     ra, bf16_to_f32
-    mv      s3, a0
+    addi    s0, s0, 4
+    addi    s1, s1, 4
+    addi    s2, s2, 4
 
-    li      s4, 0x41400000
-    bne     s3, s4 1f            
+    addi    s7, s7, 1
+    bne     s8, s7, MUL_TEST          
 
-#10.0f / 2.0f
-    li      a0, 0x41200000
-    jal     ra, f32_to_bf16                # f32_to_bf16(orig)
-    mv      s0, a0
-
-    li      a0, 0x40000000
-    jal     ra, f32_to_bf16 
-    mv      s1, a0    
-
-    mv      a0, s0    
-    mv      a1, s1  
-
+# DIV
+    li      s7, 0
+    li      s8, 7
+    la      s0, bf16_div_input_1                    
+    la      s1, bf16_div_input_2                    
+    la      s2, bf16_div_output                     
+    
+DIV_TEST:
+    lw      a0, 0(s0)
+    lw      a1, 0(s1)
+    lw      s5, 0(s2)
+    
     jal     ra, bf16_div
-    mv      s2, a0    
-    jal     ra, bf16_to_f32
-    mv      s3, a0
+    mv      s6, a0    
+    
+    bne     s6, s5, 1f 
+    
+    addi    s0, s0, 4
+    addi    s1, s1, 4
+    addi    s2, s2, 4
 
-    li      s4, 0x40A00000
-    bne     s3, s4 1f           
+    addi    s7, s7, 1
 
-#4.0f ^ 0.5
-    li      a0, 0x40800000
-    jal     ra, f32_to_bf16 
-    mv      s0, a0    
+    bne     s8, s7, DIV_TEST          
 
+# SQRT
+    li      s7, 0
+    li      s8, 3
+    la      s0, bf16_sqrt_input                                  
+    la      s2, bf16_sqrt_output                     
+    
+SQRT_TEST:
+    lw      a0, 0(s0)
+    lw      s5, 0(s2)
+    
     jal     ra, bf16_sqrt
-    mv      s2, a0    
-    jal     ra, bf16_to_f32
-    mv      s3, a0
+    mv      s6, a0    
+    
+    bne     s6, s5, 1f
+    
+    addi    s0, s0, 4
+    addi    s1, s1, 4
+    addi    s2, s2, 4
 
-    li      s4, 0x40000000
-    bne     s3, s4 1f   
+    addi    s7, s7, 1
 
-#9.0f ^ 0.5
-    li      a0, 0x41100000
-    jal     ra, f32_to_bf16 
-    mv      s0, a0    
-
-    jal     ra, bf16_sqrt
-    mv      s2, a0    
-    jal     ra, bf16_to_f32
-    mv      s3, a0
-
-    li      s4, 0x40400000
-    bne     s3, s4 1f   
+    bne     s8, s7, SQRT_TEST  
 
 #print_pass
     la      a0, arithmetic_passed_msg
