@@ -194,7 +194,7 @@ normalize_loop:
     bnez    t0, COMBINE_RESULT        
     slli    s9, s9, 1            # result_mant <<= 1
     addi    s8, s8, -1           # --result_exp
-    bge     x0, s8, return_zero  # if (result_exp <= 0) → 下溢，回 0
+    bge     x0, s8, return_zero  # if (result_exp <= 0)
     j       normalize_loop
 
 return_zero:
