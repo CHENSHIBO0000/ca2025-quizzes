@@ -239,13 +239,23 @@ uint32_t rsqrt(uint32_t x)
     uint32_t y = rsqrt_table[exp];
 
     // Linear interpolation
-    if(x > (1u << exp)){
-        uint32_t y_next = (exp < 31) ? rsqrt_table[exp + 1] : 0;
-        uint32_t delta = y - y_next;
-        uint64_t numer = ((uint64_t)(x - (1u << exp)) << 16);
-        uint32_t frac = (uint32_t)(numer >> exp);
-        y = y - (uint32_t)((mul32(delta, frac)) >> 16);
-    }
+    if (x > (1u << exp)) {
+    uint32_t y_next = (exp < 31) ? rsqrt_table[exp + 1] : 0;
+    uint32_t delta  = y - y_next;
+
+    // numer = ((uint32_t)(x - (1u<<exp)) << 16) 
+    uint32_t t      = x - (1u << exp);
+    uint32_t numer_hi = t >> 16;   // high 32 
+    uint32_t numer_lo = t << 16;   // low  32 
+
+    uint32_t frac = shr64_lo32(numer_hi, numer_lo, exp);
+    uint32_t p_hi, p_lo;
+    mul32_lohi(delta, frac, &p_hi, &p_lo);
+    uint32_t prod_shr16 = shr64_lo32(p_hi, p_lo, 16);
+
+    y = y - prod_shr16;
+}
+
 
     // Newton-Raphson iterations
     for(int iter = 0; iter < 2; iter++) {
