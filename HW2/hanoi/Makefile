@@ -6,8 +6,21 @@ LINKER_SCRIPT = linker.ld
 EMU ?= ../../build/rv32emu
 
 AFLAGS = -g $(ARCH)
-CFLAGS = -g -march=rv32i_zicsr -mabi=ilp32
 LDFLAGS = -T $(LINKER_SCRIPT)
+
+ifdef FAST
+	CFLAGS = -g -march=rv32i_zicsr -mabi=ilp32 -Ofast
+else ifdef SIZE
+	CFLAGS = -g -march=rv32i_zicsr -mabi=ilp32 -Os
+else
+	CFLAGS = -g -march=rv32i_zicsr -mabi=ilp32 -O0
+endif
+
+ifneq ($(DEFINES),)
+CFLAGS += $(DEFINES)
+endif
+
+
 EXEC = test.elf
 
 CC = $(CROSS_COMPILE)gcc
