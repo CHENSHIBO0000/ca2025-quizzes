@@ -3,39 +3,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define printstr(ptr, length)                   \
-    do {                                        \
-        asm volatile(                           \
-            "add a7, x0, 0x40;"                 \
-            "add a0, x0, 0x1;" /* stdout */     \
-            "add a1, x0, %0;"                   \
-            "mv a2, %1;" /* length character */ \
-            "ecall;"                            \
-            :                                   \
-            : "r"(ptr), "r"(length)             \
-            : "a0", "a1", "a2", "a7");          \
-    } while (0)
 
-#define TEST_OUTPUT(msg, length) printstr(msg, length)
 
-#define TEST_LOGGER(msg)                     \
-    {                                        \
-        char _msg[] = msg;                   \
-        TEST_OUTPUT(_msg, sizeof(_msg) - 1); \
-    }
+static inline void write_str_syscall(int fd, const char *ptr, long len) {
+    register long a0 asm("a0") = fd;
+    register const char *a1 asm("a1") = ptr;
+    register long a2 asm("a2") = len;
+    register long a7 asm("a7") = 64;   // system_write
+
+    asm volatile("ecall"
+                 : "+r"(a0)              
+                 : "r"(a1), "r"(a2), "r"(a7)
+                 : "memory", "cc");      
+}
+
+#define printstr(ptr, length) write_str_syscall(1, (ptr), (length))
+
+#define TEST_OUTPUT(msg, length) printstr((msg), (length))
+
+#define TEST_LOGGER(msg)                          \
+do {                                              \
+    static const char _s_[] = msg;                \
+    TEST_OUTPUT(_s_, (long)(sizeof(_s_) - 1));    \
+} while (0)
 
 extern uint64_t get_cycles(void);
 extern uint64_t get_instret(void);
 
 // /* Bare metal memcpy implementation */
-// void *memcpy(void *dest, const void *src, size_t n)
-// {
-//     uint8_t *d = (uint8_t *) dest;
-//     const uint8_t *s = (const uint8_t *) src;
-//     while (n--)
-//         *d++ = *s++;
-//     return dest;
-// }
+void *memcpy(void *dest, const void *src, size_t n)
+{
+    uint8_t *d = (uint8_t *) dest;
+    const uint8_t *s = (const uint8_t *) src;
+    while (n--)
+        *d++ = *s++;
+    return dest;
+}
 
 /* Software division for RV32I (no M extension) */
 static unsigned long udiv(unsigned long dividend, unsigned long divisor)
